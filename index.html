@@ -192,6 +192,33 @@
 
   .btn-subtext { font-size: 12px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); text-align: center; max-width: 260px; }
 
+  .today-total-banner {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent-work);
+    border-radius: 12px;
+    padding: 18px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+    box-shadow: 0 0 20px rgba(0,255,157,0.06);
+  }
+
+  .today-total-label {
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .today-total-value {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 36px;
+    color: var(--accent-work);
+    text-shadow: 0 0 16px rgba(0,255,157,0.4);
+  }
+
   .stats-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 4px; }
 
   .stat-card {
@@ -482,6 +509,11 @@
       <div class="btn-subtext" id="btnSubtext">Press to clock in travel</div>
     </div>
 
+    <div class="today-total-banner">
+      <div class="today-total-label">Today's Total Work</div>
+      <div class="today-total-value" id="todayTotalWork">—</div>
+    </div>
+
     <div class="stats-row">
       <div class="stat-card travel-card">
         <div class="stat-label">Travel Time</div>
@@ -722,6 +754,7 @@ function updateStats() {
     });
     document.getElementById('workToday').textContent   = todayWork   > 0 ? formatDur(todayWork)   : '—';
     document.getElementById('travelToday').textContent = todayTravel > 0 ? formatDur(todayTravel) : '—';
+    document.getElementById('todayTotalWork').textContent = todayWork > 0 ? formatDur(todayWork) : '—';
   }
 
   recalc();
