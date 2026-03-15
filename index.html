@@ -516,22 +516,12 @@
 
     <div class="stats-row">
       <div class="stat-card travel-card">
-        <div class="stat-label">Travel Time</div>
-        <div class="stat-sublabel">This session</div>
-        <div class="stat-value" id="travelTime">—</div>
-        <div class="stat-today">
-          <div class="stat-today-label">Today total</div>
-          <div id="travelToday">—</div>
-        </div>
+        <div class="stat-label">Today Travel</div>
+        <div class="stat-value" id="travelToday">—</div>
       </div>
       <div class="stat-card work-card">
-        <div class="stat-label">Work Time</div>
-        <div class="stat-sublabel">This session</div>
-        <div class="stat-value" id="workTime">—</div>
-        <div class="stat-today">
-          <div class="stat-today-label">Today total</div>
-          <div id="workToday">—</div>
-        </div>
+        <div class="stat-label">Today Work</div>
+        <div class="stat-value" id="workToday">—</div>
       </div>
     </div>
   </div>
@@ -741,8 +731,7 @@ function updateStats() {
       }
     }
 
-    document.getElementById('workTime').textContent   = currentSession ? formatDur(sessWork)   : '—';
-    document.getElementById('travelTime').textContent = currentSession ? formatDur(sessTravel) : '—';
+
 
     // Today totals
     const today   = todayStr();
