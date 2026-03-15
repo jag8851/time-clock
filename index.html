@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TimeClock</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@300;400;600;700;900&display=swap');
+
+  :root {
+    --bg: #0d0f12;
+    --surface: #141720;
+    --card: #1c2030;
+    --border: #252a3a;
+    --accent-travel: #00c8ff;
+    --accent-work: #00ff9d;
+    --accent-out: #ff4d6d;
+    --text: #e8ecf4;
+    --muted: #5a6280;
+    --glow-travel: 0 0 30px rgba(0,200,255,0.3);
+    --glow-work: 0 0 30px rgba(0,255,157,0.3);
+    --glow-out: 0 0 30px rgba(255,77,109,0.3);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Barlow Condensed', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .app { position: relative; z-index: 1; }
+
+  nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 32px;
+    border-bottom: 1px solid var(--border);
+    background: rgba(13,15,18,0.8);
+    backdrop-filter: blur(10px);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .logo { font-size: 22px; font-weight: 900; letter-spacing: 4px; text-transform: uppercase; }
+  .logo span { color: var(--accent-work); }
+
+  .nav-tabs {
+    display: flex;
+    gap: 4px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 4px;
+  }
+
+  .nav-tab {
+    padding: 8px 20px;
+    border: none;
+    background: transparent;
+    color: var(--muted);
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: all 0.2s;
+  }
+
+  .nav-tab.active { background: var(--card); color: var(--text); }
+  .nav-tab:hover:not(.active) { color: var(--text); }
+
+  .page { display: none; padding: 40px 32px; max-width: 700px; margin: 0 auto; }
+  .page.active { display: block; }
+
+  .clock-header { text-align: center; margin-bottom: 28px; }
+
+  .current-time {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 64px;
+    line-height: 1;
+    letter-spacing: 2px;
+    text-shadow: 0 0 20px rgba(232,236,244,0.2);
+  }
+
+  .current-date {
+    font-size: 14px;
+    letter-spacing: 4px;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-top: 8px;
+  }
+
+  .pipeline {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 24px 0;
+  }
+
+  .pipeline-step { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+
+  .step-dot {
+    width: 14px; height: 14px;
+    border-radius: 50%;
+    background: var(--border);
+    border: 2px solid var(--border);
+    transition: all 0.4s;
+  }
+
+  .step-dot.done-0 { background: var(--accent-travel); border-color: var(--accent-travel); box-shadow: 0 0 12px var(--accent-travel); }
+  .step-dot.done-1 { background: var(--accent-work); border-color: var(--accent-work); box-shadow: 0 0 12px var(--accent-work); }
+  .step-dot.done-2 { background: var(--accent-out); border-color: var(--accent-out); box-shadow: 0 0 12px var(--accent-out); }
+  .step-dot.done-3 { background: #ff8800; border-color: #ff8800; box-shadow: 0 0 12px #ff8800; }
+  .step-dot.active-step { animation: pulse-dot 1.2s ease-in-out infinite; }
+
+  @keyframes pulse-dot { 0%,100% { transform:scale(1); opacity:1; } 50% { transform:scale(1.4); opacity:0.7; } }
+
+  .step-label { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); white-space: nowrap; transition: color 0.3s; }
+  .step-label.active-label { color: var(--text); }
+
+  .pipeline-line { width: 60px; height: 2px; background: var(--border); margin-bottom: 24px; transition: background 0.4s; }
+  .pipeline-line.lit-0 { background: var(--accent-travel); }
+  .pipeline-line.lit-1 { background: var(--accent-work); }
+  .pipeline-line.lit-2 { background: var(--accent-out); }
+
+  .button-area { display: flex; flex-direction: column; align-items: center; gap: 12px; margin: 24px 0 20px; }
+
+  .punch-btn {
+    width: 185px; height: 185px;
+    border-radius: 50%;
+    border: 3px solid var(--accent-travel);
+    background: transparent;
+    cursor: pointer;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--accent-travel);
+    transition: all 0.2s;
+    position: relative;
+    line-height: 1.5;
+  }
+
+  .punch-btn::before {
+    content: '';
+    position: absolute;
+    inset: 8px;
+    border-radius: 50%;
+    border: 1px solid rgba(0,200,255,0.2);
+    transition: all 0.3s;
+  }
+
+  .punch-btn:disabled { opacity: 0.5; cursor: default; }
+
+  .punch-btn.s0,.punch-btn.s1 {
+    border-color: var(--accent-travel); color: var(--accent-travel);
+    box-shadow: var(--glow-travel), inset 0 0 40px rgba(0,200,255,0.05);
+  }
+  .punch-btn.s0::before,.punch-btn.s1::before { border-color: rgba(0,200,255,0.2); }
+  .punch-btn.s0:not(:disabled):hover,.punch-btn.s1:not(:disabled):hover {
+    background: rgba(0,200,255,0.08);
+    box-shadow: var(--glow-travel), inset 0 0 60px rgba(0,200,255,0.1), 0 0 60px rgba(0,200,255,0.2);
+    transform: scale(1.03);
+  }
+
+  .punch-btn.s2 {
+    border-color: var(--accent-work); color: var(--accent-work);
+    box-shadow: var(--glow-work), inset 0 0 40px rgba(0,255,157,0.05);
+  }
+  .punch-btn.s2::before { border-color: rgba(0,255,157,0.2); }
+  .punch-btn.s2:not(:disabled):hover {
+    background: rgba(0,255,157,0.08);
+    box-shadow: var(--glow-work), inset 0 0 60px rgba(0,255,157,0.1), 0 0 60px rgba(0,255,157,0.2);
+    transform: scale(1.03);
+  }
+
+  .punch-btn.s3,.punch-btn.s4 {
+    border-color: var(--accent-out); color: var(--accent-out);
+    box-shadow: var(--glow-out), inset 0 0 40px rgba(255,77,109,0.05);
+  }
+  .punch-btn.s3::before,.punch-btn.s4::before { border-color: rgba(255,77,109,0.2); }
+  .punch-btn.s3:not(:disabled):hover,.punch-btn.s4:not(:disabled):hover {
+    background: rgba(255,77,109,0.08);
+    box-shadow: var(--glow-out), inset 0 0 60px rgba(255,77,109,0.1), 0 0 60px rgba(255,77,109,0.2);
+    transform: scale(1.03);
+  }
+
+  .punch-btn:active:not(:disabled) { transform: scale(0.97) !important; }
+
+  .btn-hint { font-size: 12px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); text-align: center; }
+
+  .edit-session-link {
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 5px 12px;
+    cursor: pointer;
+    font-family: 'Barlow Condensed', sans-serif;
+    transition: all 0.2s;
+    display: none;
+  }
+  .edit-session-link:hover { color: var(--text); border-color: #3a4060; }
+  .edit-session-link.visible { display: inline-block; }
+
+  .stats-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px 18px;
+  }
+
+  .stat-card.travel-card { border-left: 3px solid var(--accent-travel); }
+  .stat-card.work-card { border-left: 3px solid var(--accent-work); }
+
+  .stat-label { font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--muted); margin-bottom: 4px; }
+  .stat-value { font-family: 'Share Tech Mono', monospace; font-size: 26px; line-height: 1; }
+  .stat-card.travel-card .stat-value { color: var(--accent-travel); }
+  .stat-card.work-card .stat-value { color: var(--accent-work); }
+  .stat-today { font-family: 'Share Tech Mono', monospace; font-size: 12px; color: var(--muted); margin-top: 5px; min-height: 16px; }
+
+  /* RECORDS */
+  .records-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 22px; }
+  .records-title { font-size: 32px; font-weight: 900; letter-spacing: 4px; text-transform: uppercase; }
+  .header-actions { display: flex; gap: 8px; }
+
+  .action-btn {
+    padding: 8px 16px;
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    border-radius: 6px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 12px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .action-btn:hover { color: var(--text); border-color: #3a4060; }
+  .action-btn.danger { border-color: rgba(255,77,109,0.3); color: #ff4d6d; }
+  .action-btn.danger:hover { background: rgba(255,77,109,0.1); border-color: var(--accent-out); }
+
+  .totals-bar { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 22px; }
+
+  .total-chip { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; text-align: center; }
+  .total-chip-label { font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--muted); margin-bottom: 4px; }
+  .total-chip-value { font-family: 'Share Tech Mono', monospace; font-size: 20px; }
+  .total-chip.travel-total .total-chip-value { color: var(--accent-travel); }
+  .total-chip.work-total .total-chip-value { color: var(--accent-work); }
+
+  .session-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; margin-bottom: 12px; overflow: hidden; transition: border-color 0.2s; }
+  .session-card:hover { border-color: #3a4060; }
+
+  .session-header { display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; cursor: pointer; user-select: none; }
+  .session-date { font-size: 15px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; }
+  .session-badges { display: flex; gap: 6px; align-items: center; }
+
+  .badge { padding: 3px 9px; border-radius: 4px; font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; font-family: 'Share Tech Mono', monospace; }
+  .badge-travel { background: rgba(0,200,255,0.1); color: var(--accent-travel); border: 1px solid rgba(0,200,255,0.2); }
+  .badge-work { background: rgba(0,255,157,0.1); color: var(--accent-work); border: 1px solid rgba(0,255,157,0.2); }
+  .badge-incomplete { background: rgba(255,77,109,0.1); color: var(--accent-out); border: 1px solid rgba(255,77,109,0.2); }
+
+  .session-body { display: none; padding: 12px 18px; border-top: 1px solid var(--border); }
+  .session-body.open { display: block; }
+
+  .punch-row { display: flex; align-items: center; gap: 12px; padding: 7px 0; border-bottom: 1px solid rgba(255,255,255,0.04); }
+  .punch-row:last-child { border-bottom: none; }
+
+  .punch-indicator { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .ind-0 { background: var(--accent-travel); box-shadow: 0 0 8px var(--accent-travel); }
+  .ind-1 { background: var(--accent-work); box-shadow: 0 0 8px var(--accent-work); }
+  .ind-2 { background: var(--accent-out); box-shadow: 0 0 8px var(--accent-out); }
+  .ind-3 { background: #ff8800; box-shadow: 0 0 8px #ff8800; }
+
+  .punch-name { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); width: 100px; flex-shrink: 0; }
+  .punch-time { font-family: 'Share Tech Mono', monospace; font-size: 14px; flex: 1; }
+
+  .session-footer { display: flex; justify-content: flex-end; gap: 8px; padding-top: 10px; margin-top: 4px; border-top: 1px solid var(--border); }
+
+  .chevron { transition: transform 0.2s; font-style: normal; font-size: 12px; color: var(--muted); }
+  .chevron.open { transform: rotate(180deg); }
+
+  .empty-state { text-align: center; padding: 80px 20px; color: var(--muted); }
+  .empty-icon { font-size: 48px; margin-bottom: 16px; opacity: 0.4; }
+  .empty-text { font-size: 14px; letter-spacing: 3px; text-transform: uppercase; }
+
+  .flash { position: fixed; inset: 0; pointer-events: none; z-index: 9999; opacity: 0; }
+  .flash.ft { background: var(--accent-travel); animation: fa 0.3s ease-out; }
+  .flash.fw { background: var(--accent-work); animation: fa 0.3s ease-out; }
+  .flash.fo { background: var(--accent-out); animation: fa 0.3s ease-out; }
+  @keyframes fa { 0% { opacity: 0.15; } 100% { opacity: 0; } }
+
+  /* MODAL */
+  .modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.75);
+    backdrop-filter: blur(4px);
+    z-index: 200;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s;
+  }
+  .modal-overlay.open { opacity: 1; pointer-events: all; }
+
+  .modal {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 28px;
+    width: 90%;
+    max-width: 440px;
+    transform: translateY(12px);
+    transition: transform 0.2s;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+  .modal-overlay.open .modal { transform: translateY(0); }
+
+  .modal-title { font-size: 18px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 20px; }
+
+  .modal-row { display: flex; flex-direction: column; gap: 5px; margin-bottom: 14px; }
+  .modal-label { font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--muted); }
+
+  .modal-input {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 14px;
+    color: var(--text);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 14px;
+    outline: none;
+    width: 100%;
+    transition: border-color 0.2s;
+  }
+  .modal-input:focus { border-color: var(--accent-work); }
+
+  .modal-hint { font-size: 10px; color: var(--muted); letter-spacing: 1px; margin-top: 2px; }
+
+  .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 22px; }
+
+  .modal-btn {
+    padding: 10px 22px;
+    border-radius: 8px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    cursor: pointer;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--muted);
+    transition: all 0.2s;
+  }
+  .modal-btn:hover { color: var(--text); border-color: #3a4060; }
+  .modal-btn.primary { background: var(--accent-work); color: #000; border-color: var(--accent-work); }
+  .modal-btn.primary:hover { background: #00e88d; }
+
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+</style>
+</head>
+<body>
+<div class="app">
+  <div id="flash" class="flash"></div>
+
+  <nav>
+    <div class="logo">Time<span>Clock</span></div>
+    <div class="nav-tabs">
+      <button class="nav-tab active" onclick="showPage('clock',this)">Clock</button>
+      <button class="nav-tab" onclick="showPage('records',this)">Records</button>
+    </div>
+  </nav>
+
+  <!-- CLOCK PAGE -->
+  <div class="page active" id="page-clock">
+    <div class="clock-header">
+      <div class="current-time" id="liveTime">00:00:00</div>
+      <div class="current-date" id="liveDate">—</div>
+    </div>
+
+    <div class="pipeline">
+      <div class="pipeline-step"><div class="step-dot" id="dot-0"></div><div class="step-label" id="label-0">Travel In</div></div>
+      <div class="pipeline-line" id="line-0"></div>
+      <div class="pipeline-step"><div class="step-dot" id="dot-1"></div><div class="step-label" id="label-1">Work In</div></div>
+      <div class="pipeline-line" id="line-1"></div>
+      <div class="pipeline-step"><div class="step-dot" id="dot-2"></div><div class="step-label" id="label-2">Work Out</div></div>
+      <div class="pipeline-line" id="line-2"></div>
+      <div class="pipeline-step"><div class="step-dot" id="dot-3"></div><div class="step-label" id="label-3">Travel Out</div></div>
+    </div>
+
+    <div class="button-area">
+      <button class="punch-btn s0" id="punchBtn" onclick="punch()">CLOCK<br>IN<br><span style="font-size:11px;opacity:0.7;letter-spacing:1px" id="btnSub">(TRAVEL)</span></button>
+      <div class="btn-hint" id="btnHint">Press to clock in travel</div>
+      <button class="edit-session-link" id="editCurBtn" onclick="openCurrentEditModal()">✎ Edit Current Session</button>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat-card travel-card">
+        <div class="stat-label">Travel Time</div>
+        <div class="stat-value" id="travelTime">—</div>
+        <div class="stat-today" id="travelToday"></div>
+      </div>
+      <div class="stat-card work-card">
+        <div class="stat-label">Work Time</div>
+        <div class="stat-value" id="workTime">—</div>
+        <div class="stat-today" id="workToday"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RECORDS PAGE -->
+  <div class="page" id="page-records">
+    <div class="records-header">
+      <div class="records-title">Records</div>
+      <div class="header-actions">
+        <button class="action-btn" onclick="openAddModal()">+ Add Session</button>
+        <button class="action-btn danger" onclick="clearAll()">Clear All</button>
+      </div>
+    </div>
+    <div class="totals-bar">
+      <div class="total-chip travel-total"><div class="total-chip-label">Total Travel</div><div class="total-chip-value" id="totalTravel">—</div></div>
+      <div class="total-chip work-total"><div class="total-chip-label">Total Work</div><div class="total-chip-value" id="totalWork">—</div></div>
+      <div class="total-chip"><div class="total-chip-label">Sessions</div><div class="total-chip-value" id="totalSessions">0</div></div>
+    </div>
+    <div id="recordsList"></div>
+  </div>
+</div>
+
+<!-- EDIT PAST SESSION MODAL -->
+<div class="modal-overlay" id="editModal">
+  <div class="modal">
+    <div class="modal-title" id="editModalTitle">Edit Session</div>
+    <div class="modal-row"><div class="modal-label">Travel In</div><input type="datetime-local" class="modal-input" id="e-ti" step="60"></div>
+    <div class="modal-row"><div class="modal-label">Work In</div><input type="datetime-local" class="modal-input" id="e-wi" step="60"></div>
+    <div class="modal-row"><div class="modal-label">Work Out</div><input type="datetime-local" class="modal-input" id="e-wo" step="60"></div>
+    <div class="modal-row"><div class="modal-label">Travel Out</div><input type="datetime-local" class="modal-input" id="e-to" step="60"></div>
+    <div class="modal-hint">Leave a field blank to clear that timestamp.</div>
+    <div class="modal-actions">
+      <button class="modal-btn" onclick="closeModal('editModal')">Cancel</button>
+      <button class="modal-btn primary" onclick="saveEditModal()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADD SESSION MODAL -->
+<div class="modal-overlay" id="addModal">
+  <div class="modal">
+    <div class="modal-title">Add Session</div>
+    <div class="modal-row"><div class="modal-label">Travel In</div><input type="datetime-local" class="modal-input" id="a-ti" step="60"></div>
+    <div class="modal-row"><div class="modal-label">Work In</div><input type="datetime-local" class="modal-input" id="a-wi" step="60"></div>
+    <div class="modal-row"><div class="modal-label">Work Out</div><input type="datetime-local" class="modal-input" id="a-wo" step="60"></div>
+    <div class="modal-row"><div class="modal-label">Travel Out</div><input type="datetime-local" class="modal-input" id="a-to" step="60"></div>
+    <div class="modal-hint">Fill in what you have. Incomplete sessions are allowed.</div>
+    <div class="modal-actions">
+      <button class="modal-btn" onclick="closeModal('addModal')">Cancel</button>
+      <button class="modal-btn primary" onclick="saveAddModal()">Add Session</button>
+    </div>
+  </div>
+</div>
+
+<!-- EDIT CURRENT SESSION MODAL -->
+<div class="modal-overlay" id="curModal">
+  <div class="modal">
+    <div class="modal-title">Edit Current Session</div>
+    <div class="modal-row"><div class="modal-label">Travel In</div><input type="datetime-local" class="modal-input" id="c-ti" step="60"></div>
+    <div class="modal-row"><div class="modal-label">Work In</div><input type="datetime-local" class="modal-input" id="c-wi" step="60"></div>
+    <div class="modal-row"><div class="modal-label">Work Out</div><input type="datetime-local" class="modal-input" id="c-wo" step="60"></div>
+    <div class="modal-row"><div class="modal-label">Travel Out</div><input type="datetime-local" class="modal-input" id="c-to" step="60"></div>
+    <div class="modal-hint">Edit any timestamp or clear it. The clock state will update to match.</div>
+    <div class="modal-actions">
+      <button class="modal-btn" onclick="closeModal('curModal')">Cancel</button>
+      <button class="modal-btn primary" onclick="saveCurModal()">Save</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── storage ──────────────────────────────────────────────────
+const get = k => { try { return JSON.parse(localStorage.getItem(k)); } catch { return null; } };
+const set = (k,v) => localStorage.setItem(k, JSON.stringify(v));
+const del = k => localStorage.removeItem(k);
+
+function loadRecords() { return get('tc_records') || []; }
+function saveRecords(r) { set('tc_records', r); }
+function loadCur() { return get('tc_cur'); }
+function saveCur(s) { s ? set('tc_cur', s) : del('tc_cur'); }
+
+// ── format ───────────────────────────────────────────────────
+function fmtDur(ms) {
+  if (!ms || ms <= 0) return '—';
+  const totalMin = Math.floor(ms / 60000);
+  const h = Math.floor(totalMin / 60);
+  const m = totalMin % 60;
+  if (h > 0 && m > 0) return `${h}h ${m}m`;
+  if (h > 0) return `${h}h`;
+  return `${m}m`;
+}
+
+function fmtTime(iso) {
+  if (!iso) return '—';
+  return new Date(iso).toLocaleTimeString('en-US', { hour:'2-digit', minute:'2-digit' });
+}
+
+function fmtDateFull(iso) {
+  if (!iso) return '';
+  return new Date(iso).toLocaleDateString('en-US', { weekday:'short', month:'short', day:'numeric', year:'numeric' });
+}
+
+// datetime-local ↔ ISO
+function toLocal(iso) {
+  if (!iso) return '';
+  const d = new Date(iso);
+  return new Date(d.getTime() - d.getTimezoneOffset()*60000).toISOString().slice(0,16);
+}
+function fromLocal(str) {
+  if (!str) return null;
+  return new Date(str).toISOString();
+}
+
+// ── durations ────────────────────────────────────────────────
+function workMs(s) {
+  if (!s?.workIn || !s?.workOut) return 0;
+  return Math.max(0, new Date(s.workOut) - new Date(s.workIn));
+}
+function travelMs(s) {
+  if (!s?.travelIn || !s?.travelOut) return 0;
+  const total = new Date(s.travelOut) - new Date(s.travelIn);
+  return Math.max(0, total - workMs(s));
+}
+
+function todayKey() {
+  return new Date().toLocaleDateString('en-US');
+}
+function sessionDayKey(s) {
+  const iso = s?.travelIn || s?.workIn;
+  return iso ? new Date(iso).toLocaleDateString('en-US') : '';
+}
+
+function todayTotals() {
+  const today = todayKey();
+  let w = 0, t = 0;
+  loadRecords().forEach(s => {
+    if (sessionDayKey(s) === today) { w += workMs(s); t += travelMs(s); }
+  });
+  return { w, t };
+}
+
+// ── state ────────────────────────────────────────────────────
+function deriveState(s) {
+  if (!s) return 0;
+  if (s.travelOut) return 4;
+  if (s.workOut)   return 3;
+  if (s.workIn)    return 2;
+  if (s.travelIn)  return 1;
+  return 0;
+}
+
+let cur = loadCur();
+let state = deriveState(cur);
+let tickTimer = null;
+let editIdx = -1;
+
+// ── punch ────────────────────────────────────────────────────
+const FLASHES = ['ft','fw','fo','fo'];
+
+function punch() {
+  const now = new Date().toISOString();
+  if      (state === 0) { cur = { travelIn:now, workIn:null, workOut:null, travelOut:null }; state=1; }
+  else if (state === 1) { cur.workIn = now;   state=2; }
+  else if (state === 2) { cur.workOut = now;  state=3; }
+  else if (state === 3) {
+    cur.travelOut = now; state=4;
+    const r = loadRecords(); r.unshift({...cur}); saveRecords(r);
+    saveCur(null); cur = null;
+    setTimeout(() => { state=0; updateUI(); }, 1800);
+  }
+  if (cur) saveCur(cur);
+  flash(FLASHES[Math.min(state-1,3)]);
+  updateUI();
+}
+
+// ── ui ───────────────────────────────────────────────────────
+const DOT_DONE = ['done-0','done-1','done-2','done-3'];
+const LINE_LIT  = ['lit-0','lit-1','lit-2'];
+
+const BTN_CFG = [
+  { top:'CLOCK IN',  sub:'(TRAVEL)', hint:'Press to clock in travel',                cls:'s0' },
+  { top:'CLOCK IN',  sub:'(WORK)',   hint:'Travel clocked — press to clock in work',  cls:'s1' },
+  { top:'CLOCK OUT', sub:'(WORK)',   hint:'Working — press to clock out work',         cls:'s2' },
+  { top:'CLOCK OUT', sub:'(TRAVEL)', hint:'Work done — press to clock out travel',    cls:'s3' },
+  { top:'✓ DONE',   sub:'',        hint:'Session saved! Resetting…',                 cls:'s4' },
+];
+
+function updateUI() {
+  // pipeline
+  for (let i=0;i<4;i++) {
+    const d = document.getElementById('dot-'+i);
+    const l = document.getElementById('label-'+i);
+    d.className = 'step-dot';
+    l.className = 'step-label';
+    if (i < state) d.classList.add(DOT_DONE[i]);
+    if (i === state && state < 4) { d.classList.add('active-step'); l.classList.add('active-label'); }
+  }
+  for (let i=0;i<3;i++) {
+    const ln = document.getElementById('line-'+i);
+    ln.className = 'pipeline-line';
+    if (i < state-1) ln.classList.add(LINE_LIT[i]);
+  }
+
+  // button
+  const idx = Math.min(state,4);
+  const cfg = BTN_CFG[idx];
+  const btn = document.getElementById('punchBtn');
+  const [w1,...rest] = cfg.top.split(' ');
+  btn.innerHTML = w1+'<br>'+(rest.join(' ')||'')+(cfg.sub?`<br><span style="font-size:11px;opacity:0.7;letter-spacing:1px">${cfg.sub}</span>`:'');
+  btn.className = 'punch-btn '+cfg.cls;
+  btn.disabled = state === 4;
+  document.getElementById('btnHint').textContent = cfg.hint;
+  document.getElementById('editCurBtn').classList.toggle('visible', !!cur);
+
+  // stats
+  updateStats();
+}
+
+function updateStats() {
+  if (tickTimer) { clearInterval(tickTimer); tickTimer=null; }
+
+  function calc() {
+    const now = Date.now();
+    let curWork=0, curTravel=0;
+
+    if (cur) {
+      if (cur.workIn) {
+        const wEnd = cur.workOut ? +new Date(cur.workOut) : now;
+        curWork = wEnd - new Date(cur.workIn);
+      }
+      const tStart = +new Date(cur.travelIn);
+      const tEnd = cur.travelOut ? +new Date(cur.travelOut) : now;
+      curTravel = Math.max(0, (tEnd - tStart) - curWork);
+    }
+
+    document.getElementById('workTime').textContent   = curWork>0   ? fmtDur(curWork)   : '—';
+    document.getElementById('travelTime').textContent = curTravel>0 ? fmtDur(curTravel) : (cur ? fmtDur(0) : '—');
+
+    // today totals (completed sessions only)
+    const { w:tw, t:tt } = todayTotals();
+    const allWork   = tw + curWork;
+    const allTravel = tt + curTravel;
+
+    const wTodayEl = document.getElementById('workToday');
+    const tTodayEl = document.getElementById('travelToday');
+
+    // Only show "today total" row if it differs from current session (i.e. there are prior completed sessions today)
+    wTodayEl.textContent   = tw > 0 ? `Today total: ${fmtDur(allWork)}`   : '';
+    tTodayEl.textContent   = tt > 0 ? `Today total: ${fmtDur(allTravel)}` : '';
+  }
+
+  calc();
+  if (cur) tickTimer = setInterval(calc, 15000);
+}
+
+// ── live clock ───────────────────────────────────────────────
+function tick() {
+  const n = new Date();
+  document.getElementById('liveTime').textContent =
+    String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0')+':'+String(n.getSeconds()).padStart(2,'0');
+  document.getElementById('liveDate').textContent =
+    n.toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+}
+setInterval(tick,1000); tick();
+
+// ── flash ────────────────────────────────────────────────────
+function flash(cls) {
+  const f = document.getElementById('flash');
+  f.className = 'flash';
+  void f.offsetWidth;
+  f.className = 'flash '+cls;
+  setTimeout(()=>{ f.className='flash'; },400);
+}
+
+// ── page nav ─────────────────────────────────────────────────
+function showPage(id, btn) {
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  btn.classList.add('active');
+  if (id==='records') renderRecords();
+}
+
+// ── records render ───────────────────────────────────────────
+function renderRecords() {
+  const records = loadRecords();
+  let tw=0, wt=0;
+  records.forEach(s=>{ tw+=travelMs(s); wt+=workMs(s); });
+
+  document.getElementById('totalTravel').textContent   = fmtDur(tw)||'0m';
+  document.getElementById('totalWork').textContent     = fmtDur(wt)||'0m';
+  document.getElementById('totalSessions').textContent = records.length;
+
+  const list = document.getElementById('recordsList');
+  if (!records.length) {
+    list.innerHTML = `<div class="empty-state"><div class="empty-icon">⏱</div><div class="empty-text">No sessions yet</div></div>`;
+    return;
+  }
+
+  const NAMES = ['Travel In','Work In','Work Out','Travel Out'];
+  const KEYS  = ['travelIn','workIn','workOut','travelOut'];
+
+  list.innerHTML = records.map((s,i) => {
+    const complete = KEYS.every(k=>s[k]);
+    const wm
