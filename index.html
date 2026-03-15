@@ -92,7 +92,7 @@
   .page { display: none; padding: 40px 32px; max-width: 700px; margin: 0 auto; }
   .page.active { display: block; }
 
-  .clock-header { text-align: center; margin-bottom: 28px; }
+  .clock-header { text-align: center; margin-bottom: 32px; }
 
   .current-time {
     font-family: 'Share Tech Mono', monospace;
@@ -114,7 +114,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    margin: 24px 0;
+    margin: 28px 0;
   }
 
   .pipeline-step { display: flex; flex-direction: column; align-items: center; gap: 8px; }
@@ -127,39 +127,42 @@
     transition: all 0.4s;
   }
 
-  .step-dot.done-0 { background: var(--accent-travel); border-color: var(--accent-travel); box-shadow: 0 0 12px var(--accent-travel); }
-  .step-dot.done-1 { background: var(--accent-work); border-color: var(--accent-work); box-shadow: 0 0 12px var(--accent-work); }
-  .step-dot.done-2 { background: var(--accent-out); border-color: var(--accent-out); box-shadow: 0 0 12px var(--accent-out); }
-  .step-dot.done-3 { background: #ff8800; border-color: #ff8800; box-shadow: 0 0 12px #ff8800; }
+  .step-dot.done-travel { background: var(--accent-travel); border-color: var(--accent-travel); box-shadow: 0 0 12px var(--accent-travel); }
+  .step-dot.done-work { background: var(--accent-work); border-color: var(--accent-work); box-shadow: 0 0 12px var(--accent-work); }
+  .step-dot.done-out { background: var(--accent-out); border-color: var(--accent-out); box-shadow: 0 0 12px var(--accent-out); }
   .step-dot.active-step { animation: pulse-dot 1.2s ease-in-out infinite; }
 
-  @keyframes pulse-dot { 0%,100% { transform:scale(1); opacity:1; } 50% { transform:scale(1.4); opacity:0.7; } }
+  @keyframes pulse-dot {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.4); opacity: 0.7; }
+  }
 
   .step-label { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); white-space: nowrap; transition: color 0.3s; }
   .step-label.active-label { color: var(--text); }
 
   .pipeline-line { width: 60px; height: 2px; background: var(--border); margin-bottom: 24px; transition: background 0.4s; }
-  .pipeline-line.lit-0 { background: var(--accent-travel); }
-  .pipeline-line.lit-1 { background: var(--accent-work); }
-  .pipeline-line.lit-2 { background: var(--accent-out); }
+  .pipeline-line.lit-travel { background: var(--accent-travel); }
+  .pipeline-line.lit-work { background: var(--accent-work); }
+  .pipeline-line.lit-out { background: var(--accent-out); }
 
-  .button-area { display: flex; flex-direction: column; align-items: center; gap: 12px; margin: 24px 0 20px; }
+  .button-area { display: flex; flex-direction: column; align-items: center; gap: 16px; margin: 28px 0; }
 
   .punch-btn {
-    width: 185px; height: 185px;
+    width: 190px; height: 190px;
     border-radius: 50%;
     border: 3px solid var(--accent-travel);
     background: transparent;
     cursor: pointer;
     font-family: 'Barlow Condensed', sans-serif;
-    font-size: 16px;
+    font-size: 15px;
     font-weight: 700;
-    letter-spacing: 3px;
+    letter-spacing: 2px;
     text-transform: uppercase;
     color: var(--accent-travel);
     transition: all 0.2s;
     position: relative;
     line-height: 1.5;
+    box-shadow: var(--glow-travel), inset 0 0 40px rgba(0,200,255,0.05);
   }
 
   .punch-btn::before {
@@ -171,90 +174,53 @@
     transition: all 0.3s;
   }
 
-  .punch-btn:disabled { opacity: 0.5; cursor: default; }
+  .punch-btn:hover { transform: scale(1.03); }
+  .punch-btn:active { transform: scale(0.97); }
+  .punch-btn:disabled { opacity: 0.5; cursor: default; transform: none; }
 
-  .punch-btn.s0,.punch-btn.s1 {
-    border-color: var(--accent-travel); color: var(--accent-travel);
-    box-shadow: var(--glow-travel), inset 0 0 40px rgba(0,200,255,0.05);
-  }
-  .punch-btn.s0::before,.punch-btn.s1::before { border-color: rgba(0,200,255,0.2); }
-  .punch-btn.s0:not(:disabled):hover,.punch-btn.s1:not(:disabled):hover {
-    background: rgba(0,200,255,0.08);
-    box-shadow: var(--glow-travel), inset 0 0 60px rgba(0,200,255,0.1), 0 0 60px rgba(0,200,255,0.2);
-    transform: scale(1.03);
-  }
+  .punch-btn.c-travel { border-color: var(--accent-travel); color: var(--accent-travel); box-shadow: var(--glow-travel), inset 0 0 40px rgba(0,200,255,0.05); }
+  .punch-btn.c-travel::before { border-color: rgba(0,200,255,0.2); }
+  .punch-btn.c-travel:not(:disabled):hover { background: rgba(0,200,255,0.08); }
 
-  .punch-btn.s2 {
-    border-color: var(--accent-work); color: var(--accent-work);
-    box-shadow: var(--glow-work), inset 0 0 40px rgba(0,255,157,0.05);
-  }
-  .punch-btn.s2::before { border-color: rgba(0,255,157,0.2); }
-  .punch-btn.s2:not(:disabled):hover {
-    background: rgba(0,255,157,0.08);
-    box-shadow: var(--glow-work), inset 0 0 60px rgba(0,255,157,0.1), 0 0 60px rgba(0,255,157,0.2);
-    transform: scale(1.03);
-  }
+  .punch-btn.c-work { border-color: var(--accent-work); color: var(--accent-work); box-shadow: var(--glow-work), inset 0 0 40px rgba(0,255,157,0.05); }
+  .punch-btn.c-work::before { border-color: rgba(0,255,157,0.2); }
+  .punch-btn.c-work:not(:disabled):hover { background: rgba(0,255,157,0.08); }
 
-  .punch-btn.s3,.punch-btn.s4 {
-    border-color: var(--accent-out); color: var(--accent-out);
-    box-shadow: var(--glow-out), inset 0 0 40px rgba(255,77,109,0.05);
-  }
-  .punch-btn.s3::before,.punch-btn.s4::before { border-color: rgba(255,77,109,0.2); }
-  .punch-btn.s3:not(:disabled):hover,.punch-btn.s4:not(:disabled):hover {
-    background: rgba(255,77,109,0.08);
-    box-shadow: var(--glow-out), inset 0 0 60px rgba(255,77,109,0.1), 0 0 60px rgba(255,77,109,0.2);
-    transform: scale(1.03);
-  }
+  .punch-btn.c-out { border-color: var(--accent-out); color: var(--accent-out); box-shadow: var(--glow-out), inset 0 0 40px rgba(255,77,109,0.05); }
+  .punch-btn.c-out::before { border-color: rgba(255,77,109,0.2); }
+  .punch-btn.c-out:not(:disabled):hover { background: rgba(255,77,109,0.08); }
 
-  .punch-btn:active:not(:disabled) { transform: scale(0.97) !important; }
+  .btn-subtext { font-size: 12px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); text-align: center; max-width: 260px; }
 
-  .btn-hint { font-size: 12px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); text-align: center; }
-
-  .edit-session-link {
-    font-size: 11px;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    color: var(--muted);
-    background: none;
-    border: 1px solid var(--border);
-    border-radius: 5px;
-    padding: 5px 12px;
-    cursor: pointer;
-    font-family: 'Barlow Condensed', sans-serif;
-    transition: all 0.2s;
-    display: none;
-  }
-  .edit-session-link:hover { color: var(--text); border-color: #3a4060; }
-  .edit-session-link.visible { display: inline-block; }
-
-  .stats-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .stats-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 4px; }
 
   .stat-card {
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: 12px;
-    padding: 16px 18px;
+    padding: 16px 20px;
   }
 
   .stat-card.travel-card { border-left: 3px solid var(--accent-travel); }
   .stat-card.work-card { border-left: 3px solid var(--accent-work); }
 
-  .stat-label { font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--muted); margin-bottom: 4px; }
+  .stat-label { font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--muted); margin-bottom: 2px; }
+  .stat-sublabel { font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); opacity: 0.55; margin-bottom: 6px; }
   .stat-value { font-family: 'Share Tech Mono', monospace; font-size: 26px; line-height: 1; }
   .stat-card.travel-card .stat-value { color: var(--accent-travel); }
   .stat-card.work-card .stat-value { color: var(--accent-work); }
-  .stat-today { font-family: 'Share Tech Mono', monospace; font-size: 12px; color: var(--muted); margin-top: 5px; min-height: 16px; }
+  .stat-today { font-family: 'Share Tech Mono', monospace; font-size: 14px; color: var(--muted); margin-top: 8px; border-top: 1px solid var(--border); padding-top: 8px; }
+  .stat-today-label { font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); opacity: 0.55; margin-bottom: 2px; }
 
   /* RECORDS */
-  .records-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 22px; }
+  .records-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
   .records-title { font-size: 32px; font-weight: 900; letter-spacing: 4px; text-transform: uppercase; }
-  .header-actions { display: flex; gap: 8px; }
 
-  .action-btn {
-    padding: 8px 16px;
+  .clear-btn {
+    padding: 8px 18px;
     background: transparent;
-    border: 1px solid var(--border);
-    color: var(--muted);
+    border: 1px solid #ff4d6d44;
+    color: #ff4d6d;
     border-radius: 6px;
     font-family: 'Barlow Condensed', sans-serif;
     font-size: 12px;
@@ -263,46 +229,75 @@
     cursor: pointer;
     transition: all 0.2s;
   }
-  .action-btn:hover { color: var(--text); border-color: #3a4060; }
-  .action-btn.danger { border-color: rgba(255,77,109,0.3); color: #ff4d6d; }
-  .action-btn.danger:hover { background: rgba(255,77,109,0.1); border-color: var(--accent-out); }
+  .clear-btn:hover { background: rgba(255,77,109,0.1); border-color: var(--accent-out); }
 
-  .totals-bar { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 22px; }
+  .totals-bar { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 24px; }
 
-  .total-chip { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; text-align: center; }
-  .total-chip-label { font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--muted); margin-bottom: 4px; }
+  .total-chip { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 14px; text-align: center; }
+  .total-chip-label { font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
   .total-chip-value { font-family: 'Share Tech Mono', monospace; font-size: 20px; }
   .total-chip.travel-total .total-chip-value { color: var(--accent-travel); }
   .total-chip.work-total .total-chip-value { color: var(--accent-work); }
 
-  .session-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; margin-bottom: 12px; overflow: hidden; transition: border-color 0.2s; }
+  .session-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; margin-bottom: 14px; overflow: hidden; transition: border-color 0.2s; }
   .session-card:hover { border-color: #3a4060; }
 
-  .session-header { display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; cursor: pointer; user-select: none; }
+  .session-header { display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; border-bottom: 1px solid var(--border); cursor: pointer; user-select: none; }
   .session-date { font-size: 15px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; }
-  .session-badges { display: flex; gap: 6px; align-items: center; }
+  .session-badges { display: flex; gap: 8px; align-items: center; }
 
   .badge { padding: 3px 9px; border-radius: 4px; font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; font-family: 'Share Tech Mono', monospace; }
   .badge-travel { background: rgba(0,200,255,0.1); color: var(--accent-travel); border: 1px solid rgba(0,200,255,0.2); }
   .badge-work { background: rgba(0,255,157,0.1); color: var(--accent-work); border: 1px solid rgba(0,255,157,0.2); }
   .badge-incomplete { background: rgba(255,77,109,0.1); color: var(--accent-out); border: 1px solid rgba(255,77,109,0.2); }
 
-  .session-body { display: none; padding: 12px 18px; border-top: 1px solid var(--border); }
+  .session-body { display: none; padding: 14px 18px; }
   .session-body.open { display: block; }
 
-  .punch-row { display: flex; align-items: center; gap: 12px; padding: 7px 0; border-bottom: 1px solid rgba(255,255,255,0.04); }
-  .punch-row:last-child { border-bottom: none; }
+  .punch-row { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.04); }
+  .punch-row:last-of-type { border-bottom: none; }
 
   .punch-indicator { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
-  .ind-0 { background: var(--accent-travel); box-shadow: 0 0 8px var(--accent-travel); }
-  .ind-1 { background: var(--accent-work); box-shadow: 0 0 8px var(--accent-work); }
-  .ind-2 { background: var(--accent-out); box-shadow: 0 0 8px var(--accent-out); }
-  .ind-3 { background: #ff8800; box-shadow: 0 0 8px #ff8800; }
+  .ind-travel-in  { background: var(--accent-travel); box-shadow: 0 0 8px var(--accent-travel); }
+  .ind-work-in    { background: var(--accent-work);   box-shadow: 0 0 8px var(--accent-work); }
+  .ind-work-out   { background: var(--accent-out);    box-shadow: 0 0 8px var(--accent-out); }
+  .ind-travel-out { background: #ff8800;              box-shadow: 0 0 8px #ff8800; }
 
-  .punch-name { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); width: 100px; flex-shrink: 0; }
+  .punch-name { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); width: 110px; flex-shrink: 0; }
   .punch-time { font-family: 'Share Tech Mono', monospace; font-size: 14px; flex: 1; }
 
-  .session-footer { display: flex; justify-content: flex-end; gap: 8px; padding-top: 10px; margin-top: 4px; border-top: 1px solid var(--border); }
+  .edit-time-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    border-radius: 4px;
+    padding: 3px 10px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 11px;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .edit-time-btn:hover { color: var(--text); border-color: #3a4060; }
+
+  .session-actions { display: flex; gap: 8px; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border); flex-wrap: wrap; }
+
+  .sess-btn {
+    padding: 6px 14px;
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    border-radius: 5px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .sess-btn:hover { color: var(--text); border-color: #3a4060; }
+  .sess-btn.danger { color: #ff4d6d99; border-color: #ff4d6d33; }
+  .sess-btn.danger:hover { color: var(--accent-out); border-color: var(--accent-out); background: rgba(255,77,109,0.07); }
 
   .chevron { transition: transform 0.2s; font-style: normal; font-size: 12px; color: var(--muted); }
   .chevron.open { transform: rotate(180deg); }
@@ -311,81 +306,89 @@
   .empty-icon { font-size: 48px; margin-bottom: 16px; opacity: 0.4; }
   .empty-text { font-size: 14px; letter-spacing: 3px; text-transform: uppercase; }
 
-  .flash { position: fixed; inset: 0; pointer-events: none; z-index: 9999; opacity: 0; }
-  .flash.ft { background: var(--accent-travel); animation: fa 0.3s ease-out; }
-  .flash.fw { background: var(--accent-work); animation: fa 0.3s ease-out; }
-  .flash.fo { background: var(--accent-out); animation: fa 0.3s ease-out; }
-  @keyframes fa { 0% { opacity: 0.15; } 100% { opacity: 0; } }
-
-  /* MODAL */
+  /* MODALS */
   .modal-overlay {
-    position: fixed; inset: 0;
-    background: rgba(0,0,0,0.75);
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
     backdrop-filter: blur(4px);
-    z-index: 200;
-    display: flex;
+    z-index: 500;
     align-items: center;
     justify-content: center;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.2s;
   }
-  .modal-overlay.open { opacity: 1; pointer-events: all; }
+  .modal-overlay.open { display: flex; }
 
   .modal {
     background: var(--card);
     border: 1px solid var(--border);
-    border-radius: 16px;
+    border-radius: 14px;
     padding: 28px;
-    width: 90%;
-    max-width: 440px;
-    transform: translateY(12px);
-    transition: transform 0.2s;
-    max-height: 90vh;
-    overflow-y: auto;
+    width: 380px;
+    max-width: 92vw;
   }
-  .modal-overlay.open .modal { transform: translateY(0); }
 
   .modal-title { font-size: 18px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 20px; }
 
-  .modal-row { display: flex; flex-direction: column; gap: 5px; margin-bottom: 14px; }
-  .modal-label { font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--muted); }
+  .modal-field { margin-bottom: 16px; }
+  .modal-label { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
 
   .modal-input {
+    width: 100%;
     background: var(--surface);
     border: 1px solid var(--border);
-    border-radius: 8px;
+    border-radius: 7px;
     padding: 10px 14px;
     color: var(--text);
     font-family: 'Share Tech Mono', monospace;
-    font-size: 14px;
+    font-size: 15px;
     outline: none;
-    width: 100%;
     transition: border-color 0.2s;
   }
-  .modal-input:focus { border-color: var(--accent-work); }
+  .modal-input:focus { border-color: var(--accent-travel); }
 
-  .modal-hint { font-size: 10px; color: var(--muted); letter-spacing: 1px; margin-top: 2px; }
+  .modal-select {
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    padding: 10px 14px;
+    color: var(--text);
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 15px;
+    letter-spacing: 1px;
+    outline: none;
+    transition: border-color 0.2s;
+    cursor: pointer;
+  }
+  .modal-select:focus { border-color: var(--accent-travel); }
+  .modal-select option { background: var(--card); }
 
-  .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 22px; }
+  .modal-actions { display: flex; gap: 10px; margin-top: 20px; justify-content: flex-end; }
 
   .modal-btn {
-    padding: 10px 22px;
-    border-radius: 8px;
+    padding: 9px 20px;
+    border-radius: 7px;
+    border: none;
     font-family: 'Barlow Condensed', sans-serif;
     font-size: 14px;
-    font-weight: 700;
+    font-weight: 600;
     letter-spacing: 2px;
     text-transform: uppercase;
     cursor: pointer;
-    border: 1px solid var(--border);
-    background: transparent;
-    color: var(--muted);
     transition: all 0.2s;
   }
-  .modal-btn:hover { color: var(--text); border-color: #3a4060; }
-  .modal-btn.primary { background: var(--accent-work); color: #000; border-color: var(--accent-work); }
-  .modal-btn.primary:hover { background: #00e88d; }
+  .modal-btn.primary { background: var(--accent-work); color: #000; }
+  .modal-btn.primary:hover { opacity: 0.85; }
+  .modal-btn.secondary { background: var(--surface); color: var(--muted); border: 1px solid var(--border); }
+  .modal-btn.secondary:hover { color: var(--text); }
+
+  #flash { position: fixed; inset: 0; pointer-events: none; z-index: 9999; opacity: 0; }
+  .flash-travel { background: var(--accent-travel); animation: flashAnim 0.3s ease-out forwards; }
+  .flash-work    { background: var(--accent-work);   animation: flashAnim 0.3s ease-out forwards; }
+  .flash-out     { background: var(--accent-out);    animation: flashAnim 0.3s ease-out forwards; }
+
+  @keyframes flashAnim { 0% { opacity: 0.15; } 100% { opacity: 0; } }
 
   ::-webkit-scrollbar { width: 6px; }
   ::-webkit-scrollbar-track { background: var(--bg); }
@@ -394,13 +397,52 @@
 </head>
 <body>
 <div class="app">
-  <div id="flash" class="flash"></div>
+  <div id="flash"></div>
+
+  <!-- EDIT TIMESTAMP MODAL -->
+  <div class="modal-overlay" id="editModal">
+    <div class="modal">
+      <div class="modal-title">Edit Timestamp</div>
+      <div class="modal-field">
+        <div class="modal-label">Date &amp; Time</div>
+        <input class="modal-input" type="datetime-local" id="editDateInput" step="60">
+      </div>
+      <div class="modal-actions">
+        <button class="modal-btn secondary" onclick="closeModal('editModal')">Cancel</button>
+        <button class="modal-btn primary" onclick="saveEditedTime()">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ADD PUNCH MODAL -->
+  <div class="modal-overlay" id="addPunchModal">
+    <div class="modal">
+      <div class="modal-title">Add Punch Entry</div>
+      <div class="modal-field">
+        <div class="modal-label">Punch Type</div>
+        <select class="modal-select" id="addPunchType">
+          <option value="travelIn">Travel In</option>
+          <option value="workIn">Work In</option>
+          <option value="workOut">Work Out</option>
+          <option value="travelOut">Travel Out</option>
+        </select>
+      </div>
+      <div class="modal-field">
+        <div class="modal-label">Date &amp; Time</div>
+        <input class="modal-input" type="datetime-local" id="addPunchTime" step="60">
+      </div>
+      <div class="modal-actions">
+        <button class="modal-btn secondary" onclick="closeModal('addPunchModal')">Cancel</button>
+        <button class="modal-btn primary" onclick="saveAddedPunch()">Add</button>
+      </div>
+    </div>
+  </div>
 
   <nav>
     <div class="logo">Time<span>Clock</span></div>
     <div class="nav-tabs">
-      <button class="nav-tab active" onclick="showPage('clock',this)">Clock</button>
-      <button class="nav-tab" onclick="showPage('records',this)">Records</button>
+      <button class="nav-tab active" onclick="showPage('clock', this)">Clock</button>
+      <button class="nav-tab" onclick="showPage('records', this)">Records</button>
     </div>
   </nav>
 
@@ -412,31 +454,52 @@
     </div>
 
     <div class="pipeline">
-      <div class="pipeline-step"><div class="step-dot" id="dot-0"></div><div class="step-label" id="label-0">Travel In</div></div>
+      <div class="pipeline-step">
+        <div class="step-dot" id="dot-0"></div>
+        <div class="step-label" id="label-0">Travel In</div>
+      </div>
       <div class="pipeline-line" id="line-0"></div>
-      <div class="pipeline-step"><div class="step-dot" id="dot-1"></div><div class="step-label" id="label-1">Work In</div></div>
+      <div class="pipeline-step">
+        <div class="step-dot" id="dot-1"></div>
+        <div class="step-label" id="label-1">Work In</div>
+      </div>
       <div class="pipeline-line" id="line-1"></div>
-      <div class="pipeline-step"><div class="step-dot" id="dot-2"></div><div class="step-label" id="label-2">Work Out</div></div>
+      <div class="pipeline-step">
+        <div class="step-dot" id="dot-2"></div>
+        <div class="step-label" id="label-2">Work Out</div>
+      </div>
       <div class="pipeline-line" id="line-2"></div>
-      <div class="pipeline-step"><div class="step-dot" id="dot-3"></div><div class="step-label" id="label-3">Travel Out</div></div>
+      <div class="pipeline-step">
+        <div class="step-dot" id="dot-3"></div>
+        <div class="step-label" id="label-3">Travel Out</div>
+      </div>
     </div>
 
     <div class="button-area">
-      <button class="punch-btn s0" id="punchBtn" onclick="punch()">CLOCK<br>IN<br><span style="font-size:11px;opacity:0.7;letter-spacing:1px" id="btnSub">(TRAVEL)</span></button>
-      <div class="btn-hint" id="btnHint">Press to clock in travel</div>
-      <button class="edit-session-link" id="editCurBtn" onclick="openCurrentEditModal()">✎ Edit Current Session</button>
+      <button class="punch-btn c-travel" id="punchBtn" onclick="punch()">
+        CLOCK IN<br><span style="font-size:12px;opacity:0.75;letter-spacing:1px">(TRAVEL)</span>
+      </button>
+      <div class="btn-subtext" id="btnSubtext">Press to clock in travel</div>
     </div>
 
     <div class="stats-row">
       <div class="stat-card travel-card">
         <div class="stat-label">Travel Time</div>
+        <div class="stat-sublabel">This session</div>
         <div class="stat-value" id="travelTime">—</div>
-        <div class="stat-today" id="travelToday"></div>
+        <div class="stat-today">
+          <div class="stat-today-label">Today total</div>
+          <div id="travelToday">—</div>
+        </div>
       </div>
       <div class="stat-card work-card">
         <div class="stat-label">Work Time</div>
+        <div class="stat-sublabel">This session</div>
         <div class="stat-value" id="workTime">—</div>
-        <div class="stat-today" id="workToday"></div>
+        <div class="stat-today">
+          <div class="stat-today-label">Today total</div>
+          <div id="workToday">—</div>
+        </div>
       </div>
     </div>
   </div>
@@ -445,289 +508,256 @@
   <div class="page" id="page-records">
     <div class="records-header">
       <div class="records-title">Records</div>
-      <div class="header-actions">
-        <button class="action-btn" onclick="openAddModal()">+ Add Session</button>
-        <button class="action-btn danger" onclick="clearAll()">Clear All</button>
+      <button class="clear-btn" id="clearAllBtn">Clear All</button>
+    </div>
+
+    <div class="totals-bar">
+      <div class="total-chip travel-total">
+        <div class="total-chip-label">Total Travel</div>
+        <div class="total-chip-value" id="totalTravel">0h 0m</div>
+      </div>
+      <div class="total-chip work-total">
+        <div class="total-chip-label">Total Work</div>
+        <div class="total-chip-value" id="totalWork">0h 0m</div>
+      </div>
+      <div class="total-chip">
+        <div class="total-chip-label">Sessions</div>
+        <div class="total-chip-value" id="totalSessions">0</div>
       </div>
     </div>
-    <div class="totals-bar">
-      <div class="total-chip travel-total"><div class="total-chip-label">Total Travel</div><div class="total-chip-value" id="totalTravel">—</div></div>
-      <div class="total-chip work-total"><div class="total-chip-label">Total Work</div><div class="total-chip-value" id="totalWork">—</div></div>
-      <div class="total-chip"><div class="total-chip-label">Sessions</div><div class="total-chip-value" id="totalSessions">0</div></div>
-    </div>
+
     <div id="recordsList"></div>
   </div>
 </div>
 
-<!-- EDIT PAST SESSION MODAL -->
-<div class="modal-overlay" id="editModal">
-  <div class="modal">
-    <div class="modal-title" id="editModalTitle">Edit Session</div>
-    <div class="modal-row"><div class="modal-label">Travel In</div><input type="datetime-local" class="modal-input" id="e-ti" step="60"></div>
-    <div class="modal-row"><div class="modal-label">Work In</div><input type="datetime-local" class="modal-input" id="e-wi" step="60"></div>
-    <div class="modal-row"><div class="modal-label">Work Out</div><input type="datetime-local" class="modal-input" id="e-wo" step="60"></div>
-    <div class="modal-row"><div class="modal-label">Travel Out</div><input type="datetime-local" class="modal-input" id="e-to" step="60"></div>
-    <div class="modal-hint">Leave a field blank to clear that timestamp.</div>
-    <div class="modal-actions">
-      <button class="modal-btn" onclick="closeModal('editModal')">Cancel</button>
-      <button class="modal-btn primary" onclick="saveEditModal()">Save</button>
-    </div>
-  </div>
-</div>
-
-<!-- ADD SESSION MODAL -->
-<div class="modal-overlay" id="addModal">
-  <div class="modal">
-    <div class="modal-title">Add Session</div>
-    <div class="modal-row"><div class="modal-label">Travel In</div><input type="datetime-local" class="modal-input" id="a-ti" step="60"></div>
-    <div class="modal-row"><div class="modal-label">Work In</div><input type="datetime-local" class="modal-input" id="a-wi" step="60"></div>
-    <div class="modal-row"><div class="modal-label">Work Out</div><input type="datetime-local" class="modal-input" id="a-wo" step="60"></div>
-    <div class="modal-row"><div class="modal-label">Travel Out</div><input type="datetime-local" class="modal-input" id="a-to" step="60"></div>
-    <div class="modal-hint">Fill in what you have. Incomplete sessions are allowed.</div>
-    <div class="modal-actions">
-      <button class="modal-btn" onclick="closeModal('addModal')">Cancel</button>
-      <button class="modal-btn primary" onclick="saveAddModal()">Add Session</button>
-    </div>
-  </div>
-</div>
-
-<!-- EDIT CURRENT SESSION MODAL -->
-<div class="modal-overlay" id="curModal">
-  <div class="modal">
-    <div class="modal-title">Edit Current Session</div>
-    <div class="modal-row"><div class="modal-label">Travel In</div><input type="datetime-local" class="modal-input" id="c-ti" step="60"></div>
-    <div class="modal-row"><div class="modal-label">Work In</div><input type="datetime-local" class="modal-input" id="c-wi" step="60"></div>
-    <div class="modal-row"><div class="modal-label">Work Out</div><input type="datetime-local" class="modal-input" id="c-wo" step="60"></div>
-    <div class="modal-row"><div class="modal-label">Travel Out</div><input type="datetime-local" class="modal-input" id="c-to" step="60"></div>
-    <div class="modal-hint">Edit any timestamp or clear it. The clock state will update to match.</div>
-    <div class="modal-actions">
-      <button class="modal-btn" onclick="closeModal('curModal')">Cancel</button>
-      <button class="modal-btn primary" onclick="saveCurModal()">Save</button>
-    </div>
-  </div>
-</div>
-
 <script>
-// ── storage ──────────────────────────────────────────────────
-const get = k => { try { return JSON.parse(localStorage.getItem(k)); } catch { return null; } };
-const set = (k,v) => localStorage.setItem(k, JSON.stringify(v));
-const del = k => localStorage.removeItem(k);
+// ---- STATE ----
+let state = 0;
+let currentSession = null;
+let tickInterval = null;
+let editingIdx = null;
+let editingField = null;
+let addingToIdx = null;
 
-function loadRecords() { return get('tc_records') || []; }
-function saveRecords(r) { set('tc_records', r); }
-function loadCur() { return get('tc_cur'); }
-function saveCur(s) { s ? set('tc_cur', s) : del('tc_cur'); }
+// ---- STORAGE ----
+function loadState() {
+  try {
+    const s = localStorage.getItem('tc_current');
+    if (s) {
+      currentSession = JSON.parse(s);
+      if (currentSession.travelOut) state = 4;
+      else if (currentSession.workOut) state = 3;
+      else if (currentSession.workIn) state = 2;
+      else if (currentSession.travelIn) state = 1;
+      else state = 0;
+    }
+  } catch(e) {}
+}
 
-// ── format ───────────────────────────────────────────────────
-function fmtDur(ms) {
+function saveCurrentSession() {
+  if (currentSession) localStorage.setItem('tc_current', JSON.stringify(currentSession));
+  else localStorage.removeItem('tc_current');
+}
+
+function loadRecords() {
+  try {
+    const r = localStorage.getItem('tc_records');
+    return r ? JSON.parse(r) : [];
+  } catch(e) { return []; }
+}
+
+function saveRecords(records) {
+  localStorage.setItem('tc_records', JSON.stringify(records));
+}
+
+// ---- FORMAT ----
+function formatDur(ms) {
   if (!ms || ms <= 0) return '—';
   const totalMin = Math.floor(ms / 60000);
   const h = Math.floor(totalMin / 60);
   const m = totalMin % 60;
-  if (h > 0 && m > 0) return `${h}h ${m}m`;
-  if (h > 0) return `${h}h`;
-  return `${m}m`;
+  return h > 0 ? `${h}h ${m}m` : `${m}m`;
 }
 
-function fmtTime(iso) {
-  if (!iso) return '—';
-  return new Date(iso).toLocaleTimeString('en-US', { hour:'2-digit', minute:'2-digit' });
+function formatTime(iso) {
+  if (!iso) return null;
+  return new Date(iso).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
 }
 
-function fmtDateFull(iso) {
-  if (!iso) return '';
-  return new Date(iso).toLocaleDateString('en-US', { weekday:'short', month:'short', day:'numeric', year:'numeric' });
+function formatDateHeader(iso) {
+  return new Date(iso).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
 }
 
-// datetime-local ↔ ISO
-function toLocal(iso) {
+function isoToLocal(iso) {
   if (!iso) return '';
   const d = new Date(iso);
-  return new Date(d.getTime() - d.getTimezoneOffset()*60000).toISOString().slice(0,16);
-}
-function fromLocal(str) {
-  if (!str) return null;
-  return new Date(str).toISOString();
+  const pad = n => String(n).padStart(2,'0');
+  return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
 }
 
-// ── durations ────────────────────────────────────────────────
-function workMs(s) {
-  if (!s?.workIn || !s?.workOut) return 0;
+function todayStr() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+
+// ---- SESSION CALCS ----
+function sessionWorkMs(s) {
+  if (!s.workIn || !s.workOut) return 0;
   return Math.max(0, new Date(s.workOut) - new Date(s.workIn));
 }
-function travelMs(s) {
-  if (!s?.travelIn || !s?.travelOut) return 0;
+
+function sessionTravelMs(s) {
+  if (!s.travelIn || !s.travelOut) return 0;
   const total = new Date(s.travelOut) - new Date(s.travelIn);
-  return Math.max(0, total - workMs(s));
+  return Math.max(0, total - sessionWorkMs(s));
 }
 
-function todayKey() {
-  return new Date().toLocaleDateString('en-US');
-}
-function sessionDayKey(s) {
-  const iso = s?.travelIn || s?.workIn;
-  return iso ? new Date(iso).toLocaleDateString('en-US') : '';
-}
-
-function todayTotals() {
-  const today = todayKey();
-  let w = 0, t = 0;
-  loadRecords().forEach(s => {
-    if (sessionDayKey(s) === today) { w += workMs(s); t += travelMs(s); }
-  });
-  return { w, t };
-}
-
-// ── state ────────────────────────────────────────────────────
-function deriveState(s) {
-  if (!s) return 0;
-  if (s.travelOut) return 4;
-  if (s.workOut)   return 3;
-  if (s.workIn)    return 2;
-  if (s.travelIn)  return 1;
-  return 0;
-}
-
-let cur = loadCur();
-let state = deriveState(cur);
-let tickTimer = null;
-let editIdx = -1;
-
-// ── punch ────────────────────────────────────────────────────
-const FLASHES = ['ft','fw','fo','fo'];
-
+// ---- PUNCH ----
 function punch() {
   const now = new Date().toISOString();
-  if      (state === 0) { cur = { travelIn:now, workIn:null, workOut:null, travelOut:null }; state=1; }
-  else if (state === 1) { cur.workIn = now;   state=2; }
-  else if (state === 2) { cur.workOut = now;  state=3; }
-  else if (state === 3) {
-    cur.travelOut = now; state=4;
-    const r = loadRecords(); r.unshift({...cur}); saveRecords(r);
-    saveCur(null); cur = null;
-    setTimeout(() => { state=0; updateUI(); }, 1800);
+  if (state === 0) {
+    currentSession = { travelIn: now, workIn: null, workOut: null, travelOut: null };
+    state = 1;
+    triggerFlash('flash-travel');
+  } else if (state === 1) {
+    currentSession.workIn = now;
+    state = 2;
+    triggerFlash('flash-work');
+  } else if (state === 2) {
+    currentSession.workOut = now;
+    state = 3;
+    triggerFlash('flash-out');
+  } else if (state === 3) {
+    currentSession.travelOut = now;
+    state = 4;
+    triggerFlash('flash-out');
+    const records = loadRecords();
+    records.unshift({ ...currentSession });
+    saveRecords(records);
+    currentSession = null;
+    localStorage.removeItem('tc_current');
+    setTimeout(() => { state = 0; updateUI(); }, 1500);
   }
-  if (cur) saveCur(cur);
-  flash(FLASHES[Math.min(state-1,3)]);
+  if (currentSession) saveCurrentSession();
   updateUI();
 }
 
-// ── ui ───────────────────────────────────────────────────────
-const DOT_DONE = ['done-0','done-1','done-2','done-3'];
-const LINE_LIT  = ['lit-0','lit-1','lit-2'];
+function triggerFlash(cls) {
+  const f = document.getElementById('flash');
+  f.className = '';
+  void f.offsetWidth;
+  f.className = cls;
+  setTimeout(() => { f.className = ''; }, 400);
+}
 
-const BTN_CFG = [
-  { top:'CLOCK IN',  sub:'(TRAVEL)', hint:'Press to clock in travel',                cls:'s0' },
-  { top:'CLOCK IN',  sub:'(WORK)',   hint:'Travel clocked — press to clock in work',  cls:'s1' },
-  { top:'CLOCK OUT', sub:'(WORK)',   hint:'Working — press to clock out work',         cls:'s2' },
-  { top:'CLOCK OUT', sub:'(TRAVEL)', hint:'Work done — press to clock out travel',    cls:'s3' },
-  { top:'✓ DONE',   sub:'',        hint:'Session saved! Resetting…',                 cls:'s4' },
+// ---- UI ----
+const dotClasses = ['done-travel','done-work','done-out','done-out'];
+const btnConfigs = [
+  { html: 'CLOCK IN<br><span style="font-size:12px;opacity:0.75;letter-spacing:1px">(TRAVEL)</span>',  sub: 'Press to clock in travel',             cls: 'c-travel' },
+  { html: 'CLOCK IN<br><span style="font-size:12px;opacity:0.75;letter-spacing:1px">(WORK)</span>',    sub: 'Travelling — press to clock in work',   cls: 'c-work' },
+  { html: 'CLOCK OUT<br><span style="font-size:12px;opacity:0.75;letter-spacing:1px">(WORK)</span>',   sub: 'Working — press to clock out work',      cls: 'c-out' },
+  { html: 'CLOCK OUT<br><span style="font-size:12px;opacity:0.75;letter-spacing:1px">(TRAVEL)</span>', sub: 'Work done — press to clock out travel',  cls: 'c-out' },
+  { html: '&#10003;<br><span style="font-size:12px;letter-spacing:1px">COMPLETE</span>',               sub: 'Session saved!',                         cls: 'c-travel' },
 ];
 
 function updateUI() {
-  // pipeline
-  for (let i=0;i<4;i++) {
-    const d = document.getElementById('dot-'+i);
-    const l = document.getElementById('label-'+i);
-    d.className = 'step-dot';
-    l.className = 'step-label';
-    if (i < state) d.classList.add(DOT_DONE[i]);
-    if (i === state && state < 4) { d.classList.add('active-step'); l.classList.add('active-label'); }
+  // pipeline dots
+  for (let i = 0; i < 4; i++) {
+    const dot   = document.getElementById('dot-' + i);
+    const label = document.getElementById('label-' + i);
+    dot.className   = 'step-dot';
+    label.className = 'step-label';
+    if (i < state) dot.classList.add(dotClasses[i]);
+    if (i === state && state < 4) { dot.classList.add('active-step'); label.classList.add('active-label'); }
   }
-  for (let i=0;i<3;i++) {
-    const ln = document.getElementById('line-'+i);
-    ln.className = 'pipeline-line';
-    if (i < state-1) ln.classList.add(LINE_LIT[i]);
+  // pipeline lines
+  for (let i = 0; i < 3; i++) {
+    const line = document.getElementById('line-' + i);
+    line.className = 'pipeline-line';
+    if (i < state - 1) {
+      if (i === 0) line.classList.add('lit-travel');
+      else if (i === 1) line.classList.add('lit-work');
+      else line.classList.add('lit-out');
+    }
   }
-
   // button
-  const idx = Math.min(state,4);
-  const cfg = BTN_CFG[idx];
+  const cfg = btnConfigs[Math.min(state, 4)];
   const btn = document.getElementById('punchBtn');
-  const [w1,...rest] = cfg.top.split(' ');
-  btn.innerHTML = w1+'<br>'+(rest.join(' ')||'')+(cfg.sub?`<br><span style="font-size:11px;opacity:0.7;letter-spacing:1px">${cfg.sub}</span>`:'');
-  btn.className = 'punch-btn '+cfg.cls;
-  btn.disabled = state === 4;
-  document.getElementById('btnHint').textContent = cfg.hint;
-  document.getElementById('editCurBtn').classList.toggle('visible', !!cur);
-
+  btn.innerHTML   = cfg.html;
+  btn.className   = 'punch-btn ' + cfg.cls;
+  btn.disabled    = state === 4;
+  document.getElementById('btnSubtext').textContent = cfg.sub;
   // stats
   updateStats();
 }
 
 function updateStats() {
-  if (tickTimer) { clearInterval(tickTimer); tickTimer=null; }
+  if (tickInterval) { clearInterval(tickInterval); tickInterval = null; }
 
-  function calc() {
+  function recalc() {
     const now = Date.now();
-    let curWork=0, curTravel=0;
+    let sessWork = 0, sessTravel = 0;
 
-    if (cur) {
-      if (cur.workIn) {
-        const wEnd = cur.workOut ? +new Date(cur.workOut) : now;
-        curWork = wEnd - new Date(cur.workIn);
+    if (currentSession) {
+      if (currentSession.workIn) {
+        const we = currentSession.workOut ? new Date(currentSession.workOut).getTime() : now;
+        sessWork = Math.max(0, we - new Date(currentSession.workIn).getTime());
       }
-      const tStart = +new Date(cur.travelIn);
-      const tEnd = cur.travelOut ? +new Date(cur.travelOut) : now;
-      curTravel = Math.max(0, (tEnd - tStart) - curWork);
+      if (currentSession.travelIn) {
+        const te = currentSession.travelOut ? new Date(currentSession.travelOut).getTime() : now;
+        sessTravel = Math.max(0, (te - new Date(currentSession.travelIn).getTime()) - sessWork);
+      }
     }
 
-    document.getElementById('workTime').textContent   = curWork>0   ? fmtDur(curWork)   : '—';
-    document.getElementById('travelTime').textContent = curTravel>0 ? fmtDur(curTravel) : (cur ? fmtDur(0) : '—');
+    document.getElementById('workTime').textContent   = currentSession ? formatDur(sessWork)   : '—';
+    document.getElementById('travelTime').textContent = currentSession ? formatDur(sessTravel) : '—';
 
-    // today totals (completed sessions only)
-    const { w:tw, t:tt } = todayTotals();
-    const allWork   = tw + curWork;
-    const allTravel = tt + curTravel;
-
-    const wTodayEl = document.getElementById('workToday');
-    const tTodayEl = document.getElementById('travelToday');
-
-    // Only show "today total" row if it differs from current session (i.e. there are prior completed sessions today)
-    wTodayEl.textContent   = tw > 0 ? `Today total: ${fmtDur(allWork)}`   : '';
-    tTodayEl.textContent   = tt > 0 ? `Today total: ${fmtDur(allTravel)}` : '';
+    // Today totals
+    const today   = todayStr();
+    const records = loadRecords();
+    let todayWork = sessWork, todayTravel = sessTravel;
+    records.forEach(s => {
+      const d = (s.travelIn || s.workIn || '').slice(0,10);
+      if (d === today) { todayWork += sessionWorkMs(s); todayTravel += sessionTravelMs(s); }
+    });
+    document.getElementById('workToday').textContent   = todayWork   > 0 ? formatDur(todayWork)   : '—';
+    document.getElementById('travelToday').textContent = todayTravel > 0 ? formatDur(todayTravel) : '—';
   }
 
-  calc();
-  if (cur) tickTimer = setInterval(calc, 15000);
+  recalc();
+  if (currentSession && state > 0 && state < 4) {
+    tickInterval = setInterval(recalc, 15000);
+  }
 }
 
-// ── live clock ───────────────────────────────────────────────
-function tick() {
+// ---- CLOCK ----
+function updateClock() {
   const n = new Date();
   document.getElementById('liveTime').textContent =
-    String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0')+':'+String(n.getSeconds()).padStart(2,'0');
+    String(n.getHours()).padStart(2,'0') + ':' + String(n.getMinutes()).padStart(2,'0') + ':' + String(n.getSeconds()).padStart(2,'0');
   document.getElementById('liveDate').textContent =
-    n.toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+    n.toLocaleDateString('en-US', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
 }
-setInterval(tick,1000); tick();
+setInterval(updateClock, 1000);
+updateClock();
 
-// ── flash ────────────────────────────────────────────────────
-function flash(cls) {
-  const f = document.getElementById('flash');
-  f.className = 'flash';
-  void f.offsetWidth;
-  f.className = 'flash '+cls;
-  setTimeout(()=>{ f.className='flash'; },400);
-}
-
-// ── page nav ─────────────────────────────────────────────────
-function showPage(id, btn) {
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
-  document.getElementById('page-'+id).classList.add('active');
-  btn.classList.add('active');
-  if (id==='records') renderRecords();
+// ---- NAV ----
+function showPage(id, tab) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  tab.classList.add('active');
+  if (id === 'records') renderRecords();
+  if (id === 'clock') updateStats();
 }
 
-// ── records render ───────────────────────────────────────────
+// ---- RECORDS ----
 function renderRecords() {
   const records = loadRecords();
-  let tw=0, wt=0;
-  records.forEach(s=>{ tw+=travelMs(s); wt+=workMs(s); });
-
-  document.getElementById('totalTravel').textContent   = fmtDur(tw)||'0m';
-  document.getElementById('totalWork').textContent     = fmtDur(wt)||'0m';
+  let totalWork = 0, totalTravel = 0;
+  records.forEach(s => { totalWork += sessionWorkMs(s); totalTravel += sessionTravelMs(s); });
+  document.getElementById('totalWork').textContent    = formatDur(totalWork)   || '0h 0m';
+  document.getElementById('totalTravel').textContent  = formatDur(totalTravel) || '0h 0m';
   document.getElementById('totalSessions').textContent = records.length;
 
   const list = document.getElementById('recordsList');
@@ -736,9 +766,123 @@ function renderRecords() {
     return;
   }
 
-  const NAMES = ['Travel In','Work In','Work Out','Travel Out'];
-  const KEYS  = ['travelIn','workIn','workOut','travelOut'];
+  const punchDefs = [
+    { key: 'travelIn',  label: 'Travel In',  indCls: 'ind-travel-in'  },
+    { key: 'workIn',    label: 'Work In',    indCls: 'ind-work-in'    },
+    { key: 'workOut',   label: 'Work Out',   indCls: 'ind-work-out'   },
+    { key: 'travelOut', label: 'Travel Out', indCls: 'ind-travel-out' },
+  ];
 
-  list.innerHTML = records.map((s,i) => {
-    const complete = KEYS.every(k=>s[k]);
-    const wm
+  list.innerHTML = records.map((s, i) => {
+    const wMs = sessionWorkMs(s);
+    const tMs = sessionTravelMs(s);
+    const complete = s.travelIn && s.workIn && s.workOut && s.travelOut;
+    const anchorDate = s.travelIn || s.workIn || s.workOut || s.travelOut;
+
+    const rows = punchDefs.map(p => {
+      const t = s[p.key] ? formatTime(s[p.key]) : null;
+      return `
+        <div class="punch-row">
+          <div class="punch-indicator ${p.indCls}"></div>
+          <div class="punch-name">${p.label}</div>
+          <div class="punch-time">${t || '<span style="color:var(--muted)">—</span>'}</div>
+          <button class="edit-time-btn" onclick="openEditModal(${i},'${p.key}')">Edit</button>
+        </div>`;
+    }).join('');
+
+    return `
+      <div class="session-card">
+        <div class="session-header" onclick="toggleSession(${i})">
+          <div class="session-date">${formatDateHeader(anchorDate)}</div>
+          <div class="session-badges">
+            ${wMs ? `<span class="badge badge-work">${formatDur(wMs)}</span>` : ''}
+            ${tMs ? `<span class="badge badge-travel">${formatDur(tMs)}</span>` : ''}
+            ${!complete ? '<span class="badge badge-incomplete">Incomplete</span>' : ''}
+            <i class="chevron" id="chev-${i}">▾</i>
+          </div>
+        </div>
+        <div class="session-body" id="body-${i}">
+          ${rows}
+          <div class="session-actions">
+            <button class="sess-btn" onclick="openAddPunchModal(${i})">+ Add Punch</button>
+            <button class="sess-btn danger" onclick="deleteSession(${i})">Delete Session</button>
+          </div>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function toggleSession(i) {
+  const body = document.getElementById('body-' + i);
+  const chev = document.getElementById('chev-' + i);
+  body.classList.toggle('open');
+  chev.classList.toggle('open', body.classList.contains('open'));
+}
+
+// ---- EDIT MODAL ----
+function openEditModal(idx, field) {
+  editingIdx   = idx;
+  editingField = field;
+  const records = loadRecords();
+  const val = records[idx][field];
+  document.getElementById('editDateInput').value = val ? isoToLocal(val) : isoToLocal(new Date().toISOString());
+  openModal('editModal');
+}
+
+function saveEditedTime() {
+  const val = document.getElementById('editDateInput').value;
+  if (!val) { closeModal('editModal'); return; }
+  const records = loadRecords();
+  records[editingIdx][editingField] = new Date(val).toISOString();
+  saveRecords(records);
+  closeModal('editModal');
+  renderRecords();
+}
+
+// ---- ADD PUNCH MODAL ----
+function openAddPunchModal(idx) {
+  addingToIdx = idx;
+  document.getElementById('addPunchTime').value = isoToLocal(new Date().toISOString());
+  openModal('addPunchModal');
+}
+
+function saveAddedPunch() {
+  const type = document.getElementById('addPunchType').value;
+  const val  = document.getElementById('addPunchTime').value;
+  if (!val) { closeModal('addPunchModal'); return; }
+  const records = loadRecords();
+  records[addingToIdx][type] = new Date(val).toISOString();
+  saveRecords(records);
+  closeModal('addPunchModal');
+  renderRecords();
+}
+
+// ---- MODAL HELPERS ----
+function openModal(id)  { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+document.querySelectorAll('.modal-overlay').forEach(o => {
+  o.addEventListener('click', e => { if (e.target === o) o.classList.remove('open'); });
+});
+
+// ---- DELETE / CLEAR ----
+function deleteSession(i) {
+  if (!confirm('Delete this session?')) return;
+  const records = loadRecords();
+  records.splice(i, 1);
+  saveRecords(records);
+  renderRecords();
+}
+
+document.getElementById('clearAllBtn').addEventListener('click', function() {
+  if (!confirm('Clear ALL saved records? This cannot be undone.')) return;
+  saveRecords([]);
+  renderRecords();
+});
+
+// ---- INIT ----
+loadState();
+updateUI();
+</script>
+</body>
+</html>
