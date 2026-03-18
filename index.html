@@ -62,6 +62,9 @@
   .logo { font-size: 22px; font-weight: 900; letter-spacing: 4px; text-transform: uppercase; }
   .logo span { color: var(--accent-work); }
 
+  .logo-wrap { display: flex; flex-direction: column; gap: 2px; }
+  .version-tag { font-family: 'Share Tech Mono', monospace; font-size: 11px; color: var(--muted); letter-spacing: 1px; }
+
   .nav-tabs {
     display: flex;
     gap: 4px;
@@ -466,7 +469,10 @@
   </div>
 
   <nav>
-    <div class="logo">Time<span>Clock</span></div>
+    <div class="logo-wrap">
+      <div class="logo">Time<span>Clock</span></div>
+      <div class="version-tag">v1.4</div>
+    </div>
     <div class="nav-tabs">
       <button class="nav-tab active" onclick="showPage('clock', this)">Clock</button>
       <button class="nav-tab" onclick="showPage('records', this)">Records</button>
@@ -531,21 +537,6 @@
     <div class="records-header">
       <div class="records-title">Records</div>
       <button class="clear-btn" id="clearAllBtn">Clear All</button>
-    </div>
-
-    <div class="totals-bar">
-      <div class="total-chip travel-total">
-        <div class="total-chip-label">Total Travel</div>
-        <div class="total-chip-value" id="totalTravel">0h 0m</div>
-      </div>
-      <div class="total-chip work-total">
-        <div class="total-chip-label">Total Work</div>
-        <div class="total-chip-value" id="totalWork">0h 0m</div>
-      </div>
-      <div class="total-chip">
-        <div class="total-chip-label">Sessions</div>
-        <div class="total-chip-value" id="totalSessions">0</div>
-      </div>
     </div>
 
     <div id="recordsList"></div>
@@ -718,7 +709,7 @@ function updateStats() {
 
   function recalc() {
     const now = Date.now();
-    let sessWork = 0, sessTravel = 0;
+    let sessWork = 0, sessTravel = 0, sessTotal = 0;
 
     if (currentSession) {
       if (currentSession.workIn) {
@@ -727,29 +718,37 @@ function updateStats() {
       }
       if (currentSession.travelIn) {
         const te = currentSession.travelOut ? new Date(currentSession.travelOut).getTime() : now;
-        sessTravel = Math.max(0, (te - new Date(currentSession.travelIn).getTime()) - sessWork);
+        const total = te - new Date(currentSession.travelIn).getTime();
+        sessTravel = Math.max(0, total - sessWork);
+        sessTotal  = Math.max(0, total); // full span travelIn → now
       }
     }
 
-
-
-    // Today totals
+    // Today totals from saved records
     const today   = todayStr();
     const records = loadRecords();
-    let todayWork = sessWork, todayTravel = sessTravel;
+    let todayWork = sessWork, todayTravel = sessTravel, todayTotal = sessTotal;
     records.forEach(s => {
       const d = (s.travelIn || s.workIn || '').slice(0,10);
-      if (d === today) { todayWork += sessionWorkMs(s); todayTravel += sessionTravelMs(s); }
+      if (d === today) {
+        todayWork   += sessionWorkMs(s);
+        todayTravel += sessionTravelMs(s);
+        // full span for each saved session
+        if (s.travelIn && s.travelOut) {
+          todayTotal += Math.max(0, new Date(s.travelOut) - new Date(s.travelIn));
+        } else if (s.travelIn) {
+          todayTotal += sessionWorkMs(s) + sessionTravelMs(s);
+        }
+      }
     });
-    const todayTotal = todayWork + todayTravel;
-    document.getElementById('workToday').textContent   = todayWork   > 0 ? formatDur(todayWork)   : '—';
-    document.getElementById('travelToday').textContent = todayTravel > 0 ? formatDur(todayTravel) : '—';
-    document.getElementById('todayTotalWork').textContent = todayTotal > 0 ? formatDur(todayTotal) : '—';
+    document.getElementById('workToday').textContent      = todayWork   > 0 ? formatDur(todayWork)   : '—';
+    document.getElementById('travelToday').textContent    = todayTravel > 0 ? formatDur(todayTravel) : '—';
+    document.getElementById('todayTotalWork').textContent = todayTotal  > 0 ? formatDur(todayTotal)  : '—';
   }
 
   recalc();
   if (currentSession && state > 0 && state < 4) {
-    tickInterval = setInterval(recalc, 15000);
+    tickInterval = setInterval(recalc, 1000);
   }
 }
 
@@ -777,11 +776,6 @@ function showPage(id, tab) {
 // ---- RECORDS ----
 function renderRecords() {
   const records = loadRecords();
-  let totalWork = 0, totalTravel = 0;
-  records.forEach(s => { totalWork += sessionWorkMs(s); totalTravel += sessionTravelMs(s); });
-  document.getElementById('totalWork').textContent    = formatDur(totalWork)   || '0h 0m';
-  document.getElementById('totalTravel').textContent  = formatDur(totalTravel) || '0h 0m';
-  document.getElementById('totalSessions').textContent = records.length;
 
   const list = document.getElementById('recordsList');
   if (!records.length) {
@@ -797,10 +791,16 @@ function renderRecords() {
   ];
 
   list.innerHTML = records.map((s, i) => {
-    const wMs = sessionWorkMs(s);
-    const tMs = sessionTravelMs(s);
     const complete = s.travelIn && s.workIn && s.workOut && s.travelOut;
     const anchorDate = s.travelIn || s.workIn || s.workOut || s.travelOut;
+
+    // Total clocked = travelIn to travelOut (full span)
+    let totalMs = 0;
+    if (s.travelIn && s.travelOut) {
+      totalMs = Math.max(0, new Date(s.travelOut) - new Date(s.travelIn));
+    } else if (s.travelIn) {
+      totalMs = sessionWorkMs(s) + sessionTravelMs(s);
+    }
 
     const rows = punchDefs.map(p => {
       const t = s[p.key] ? formatTime(s[p.key]) : null;
@@ -818,8 +818,7 @@ function renderRecords() {
         <div class="session-header" onclick="toggleSession(${i})">
           <div class="session-date">${formatDateHeader(anchorDate)}</div>
           <div class="session-badges">
-            ${wMs ? `<span class="badge badge-work">${formatDur(wMs)}</span>` : ''}
-            ${tMs ? `<span class="badge badge-travel">${formatDur(tMs)}</span>` : ''}
+            ${totalMs ? `<span class="badge badge-work">${formatDur(totalMs)}</span>` : ''}
             ${!complete ? '<span class="badge badge-incomplete">Incomplete</span>' : ''}
             <i class="chevron" id="chev-${i}">▾</i>
           </div>
