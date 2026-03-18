@@ -603,7 +603,7 @@ function formatDur(ms) {
 
 function formatTime(iso) {
   if (!iso) return null;
-  return new Date(iso).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+  return new Date(iso).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
 }
 
 function formatDateHeader(iso) {
@@ -741,9 +741,10 @@ function updateStats() {
       const d = (s.travelIn || s.workIn || '').slice(0,10);
       if (d === today) { todayWork += sessionWorkMs(s); todayTravel += sessionTravelMs(s); }
     });
+    const todayTotal = todayWork + todayTravel;
     document.getElementById('workToday').textContent   = todayWork   > 0 ? formatDur(todayWork)   : '—';
     document.getElementById('travelToday').textContent = todayTravel > 0 ? formatDur(todayTravel) : '—';
-    document.getElementById('todayTotalWork').textContent = todayWork > 0 ? formatDur(todayWork) : '—';
+    document.getElementById('todayTotalWork').textContent = todayTotal > 0 ? formatDur(todayTotal) : '—';
   }
 
   recalc();
